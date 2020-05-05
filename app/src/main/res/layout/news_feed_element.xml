@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/news_feed_element_height"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_normal">
+
+    <TextView
+        android:id="@+id/news_feed_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/spacing_extra_small"
+        android:textSize="@dimen/text_size_large"
+        tools:text="News feed title" />
+
+
+        <TextView
+            android:id="@+id/news_feed_byline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Janet Murphy"
+            />
+
+        <TextView
+            android:id="@+id/news_feed_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            tools:text="1.01.2020" />
+
+
+    <TextView
+        android:id="@+id/news_feed_section"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Technology" />
+</LinearLayout>

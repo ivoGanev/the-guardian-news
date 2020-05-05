@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="News Settings">
+<ListPreference
+    android:title="@string/menu_item_sort"
+    android:key="@string/menu_item_sort_key"
+    android:entries="@array/sort_entries_label"
+    android:entryValues="@array/sort_entries_values"
+    android:dialogTitle="@string/menu_item_sort"/>
+
+</PreferenceScreen>
