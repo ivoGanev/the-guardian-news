@@ -1,6 +1,7 @@
 package android.ivo.newsapp;
 
 import android.content.Context;
+import android.util.JsonReader;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-class NewsLoader extends AsyncTaskLoader<List<News>> {
+class NewsLoader extends AsyncTaskLoader<NewsResponse> {
     private static final String TAG = "NewsLoader";
     private String mUri;
 
@@ -24,21 +25,27 @@ class NewsLoader extends AsyncTaskLoader<List<News>> {
         mUri = uri;
     }
 
+    @Override
+    public void onCanceled(@Nullable NewsResponse data) {
+        super.onCanceled(data);
+        Log.d(TAG, "onCanceled: ");
+    }
+
     @Nullable
     @Override
-    public List<News> loadInBackground() {
+    public NewsResponse loadInBackground() {
         /*
          * Retrieve the JSON data and bind it to a list
          * */
-        ArrayList<News> arrayList = new ArrayList<News>();
+        NewsResponse newsResponse = null;
         try {
             String json = HttpUtilities.retrieveJsonData(mUri);
-            arrayList = BindJsonData(json);
+            newsResponse = BindJsonData(json);
 
         } catch (IOException e) {
             Log.e(TAG, "loadInBackground: " + e);
         }
-        return arrayList;
+        return newsResponse;
     }
 
     @Override
@@ -46,12 +53,18 @@ class NewsLoader extends AsyncTaskLoader<List<News>> {
         forceLoad();
     }
 
-    private ArrayList<News> BindJsonData(String json) {
-        ArrayList<News> newsArray = new ArrayList<>();
+    private NewsResponse BindJsonData(String json) {
+        NewsResponse newsResponse = new NewsResponse(null, 0, 0);
+
         try {
+            ArrayList<News> news = new ArrayList<>();
+
             JSONObject jsonObject = new JSONObject(json);
             JSONObject response = jsonObject.getJSONObject("response");
             JSONArray results = response.getJSONArray("results");
+
+            int currentPage = response.getInt("currentPage");
+            int totalPages = response.getInt("total");
 
             for (int i = 0; i < results.length(); i++) {
                 JSONObject element = results.getJSONObject(i);
@@ -59,7 +72,7 @@ class NewsLoader extends AsyncTaskLoader<List<News>> {
                 try {
                     fields = element.getJSONObject("fields");
                 } catch (JSONException e) {
-                    // Silent exception
+                    // sometime fields is null and exception is being thrown so it needs to be caught
                 }
 
                 String date = element.getString("webPublicationDate");
@@ -68,8 +81,8 @@ class NewsLoader extends AsyncTaskLoader<List<News>> {
                 String sectionName = element.getString("sectionName");
 
                 String byline = null;
-                if(fields!=null)
-                   byline = fields.getString("byline");
+                if (fields != null)
+                    byline = fields.getString("byline");
 
                 News newsElement = new News.Builder()
                         .publicationDate(date)
@@ -79,14 +92,17 @@ class NewsLoader extends AsyncTaskLoader<List<News>> {
                         .byline(byline)
                         .build();
 
-                newsArray.add(newsElement);
+                news.add(newsElement);
             }
+
+            newsResponse = new NewsResponse(news, currentPage, totalPages);
 
         } catch (JSONException e) {
             Log.e(TAG, "BindJsonData: " + e);
         }
 
-        return newsArray;
+        return newsResponse;
     }
+
 
 }

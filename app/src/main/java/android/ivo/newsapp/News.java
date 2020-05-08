@@ -69,10 +69,11 @@ class News {
 
     String getPublicationDate() {
         String result = publicationDate;
-
-        result = result
-                .replace("T", " at ")
-                .replace("Z", "");
+        if (result != null) {
+            result = result
+                    .replace("T", " at ")
+                    .replace("Z", "");
+        }
         return result;
     }
 
@@ -90,5 +91,16 @@ class News {
 
     String getHttpUrl() {
         return httpUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "News{" +
+                "publicationDate='" + publicationDate + '\'' +
+                ", sectionName='" + sectionName + '\'' +
+                ", title='" + title + '\'' +
+                ", httpUrl='" + httpUrl + '\'' +
+                ", byline='" + byline + '\'' +
+                '}';
     }
 }
