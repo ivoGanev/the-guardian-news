@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,10 +30,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private ActivityMainBinding mBinding;
     private NewsFragmentPagerAdapter mAdapter;
     private ViewPager mViewPager;
-    private static final String TAG = "MainActivity";
+    private String mUserInput;
 
+    private static final String TAG = "MainActivity";
     private static final String GUARDIAN_URL = "https://content.guardianapis.com/search";
     private static final String API_KEY = "test";
+    private static final String USER_INPUT_KEY = "userInput";
 
     private OnNewsQueryComplete mOnNewsQueryComplete = null;
     private Queue<FragmentArgs> mFragmentLoadingQueue = new LinkedList<>();
@@ -57,21 +60,29 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        /*
-         * Inflate and bind the views
-         * */
+        // Inflate the View
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View root = mBinding.getRoot();
         setContentView(root);
+
+        Log.d(TAG, "onCreate: " + (savedInstanceState==null));
+        // Load all saved data
+        if (savedInstanceState != null
+                && savedInstanceState.getString(USER_INPUT_KEY) != null) {
+            mBinding.activityMainTextInput.setText(savedInstanceState.getString(USER_INPUT_KEY));
+        }
+
+        // Create the view pager
         mViewPager = mBinding.activityMainViewPager;
-
-        LoaderManager loaderManager = LoaderManager.getInstance(this);
-        loaderManager.initLoader(0, null, this);
-
         mAdapter = new NewsFragmentPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mAdapter);
 
+        // Listen for user input and update any API queries
+        attachTextChangedListener();
+    }
+
+    private void attachTextChangedListener() {
         /*
          * When the user types in the text we are refreshing the data from the Guardian
          * */
@@ -137,12 +148,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // After a new URI request has finished we load the data into the first fragment always
         if (mOnNewsQueryComplete != null) {
             // probably no internet connection
-            if(data==null) {
+            if (data == null) {
                 mOnNewsQueryComplete.onNewsQueryComplete(null);
                 // nothing else to do here
                 return;
-            }
-            else {
+            } else {
                 // data is loaded call the waiting fragment
                 mOnNewsQueryComplete.onNewsQueryComplete(data.getNews());
             }
@@ -222,5 +232,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     public interface OnNewsQueryComplete {
         void onNewsQueryComplete(ArrayList<News> newsData);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        String value = mBinding.activityMainTextInput.getText().toString();
+        outState.putString(USER_INPUT_KEY, value);
+        super.onSaveInstanceState(outState);
     }
 }
