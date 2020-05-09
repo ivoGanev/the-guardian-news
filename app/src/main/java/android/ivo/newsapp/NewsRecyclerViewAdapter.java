@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
-    private static final String TAG = "NewsRecyclerViewAdapter";
     private List<News> mNews;
 
     NewsRecyclerViewAdapter(List<News> news) {
@@ -22,11 +21,6 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
     void addAll(List<News> news) {
         mNews = news;
-        notifyDataSetChanged();
-    }
-
-    void clear() {
-        mNews = null;
         notifyDataSetChanged();
     }
 
@@ -51,7 +45,6 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
         else
             holder.byline.setVisibility(View.GONE);
 
-        // On click open the intent as a new web page
         holder.rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

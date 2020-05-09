@@ -1,7 +1,6 @@
 package android.ivo.newsapp;
 
 import android.content.Context;
-import android.util.JsonReader;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -14,7 +13,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 class NewsLoader extends AsyncTaskLoader<NewsResponse> {
     private static final String TAG = "NewsLoader";
@@ -25,18 +23,9 @@ class NewsLoader extends AsyncTaskLoader<NewsResponse> {
         mUri = uri;
     }
 
-    @Override
-    public void onCanceled(@Nullable NewsResponse data) {
-        super.onCanceled(data);
-        Log.d(TAG, "onCanceled: ");
-    }
-
     @Nullable
     @Override
     public NewsResponse loadInBackground() {
-        /*
-         * Retrieve the JSON data and bind it to a list
-         * */
         NewsResponse newsResponse = null;
         try {
             String json = HttpUtilities.retrieveJsonData(mUri);
@@ -72,7 +61,7 @@ class NewsLoader extends AsyncTaskLoader<NewsResponse> {
                 try {
                     fields = element.getJSONObject("fields");
                 } catch (JSONException e) {
-                    // sometime fields is null and exception is being thrown so it needs to be caught
+                    // 'fields' could go null, don't remove the catch block
                 }
 
                 String date = element.getString("webPublicationDate");

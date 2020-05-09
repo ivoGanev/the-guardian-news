@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceFragmentCompat;
 
 public class PreferenceActivity extends AppCompatActivity {
-    public static final int REQUEST_UPDATE = 1;
+    public static final int REQUEST_UPDATE_CODE = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -21,23 +21,17 @@ public class PreferenceActivity extends AppCompatActivity {
 
     public static class PreferenceActivityFragment extends PreferenceFragmentCompat implements Preference.OnPreferenceChangeListener {
         @Override
-        // Every time a preference gets changed this method will be called back
+
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            // setSummary shows a brief summary text in the UI underneath the preference which explains the current
-            // input value
             preference.setSummary(newValue.toString());
             return true;
         }
 
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-            // inflate the settings
             setPreferencesFromResource(R.xml.settings, rootKey);
-
-            // locate the preference
             Preference sortingPreference = findPreference(getString(R.string.menu_item_sort_key));
 
-            // we need to set a default value for the list
             bindPreference(sortingPreference);
         }
 
@@ -49,7 +43,7 @@ public class PreferenceActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
                 String defaultValue = sharedPreferences.getString(preference.getKey(), "");
 
-                // Call on preference change to update the summary
+                // Update the summary
                 onPreferenceChange(preference, defaultValue);
             }
         }
@@ -57,8 +51,8 @@ public class PreferenceActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Request update from the main activity when the back button is pressed.
+        // Request update tells the main activity to do an Guardian API query
         Intent i = new Intent(this, MainActivity.class);
-        startActivityForResult(i, REQUEST_UPDATE);
+        startActivityForResult(i, REQUEST_UPDATE_CODE);
     }
 }

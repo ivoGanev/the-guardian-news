@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,19 +25,17 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<NewsResponse> {
-
     private ActivityMainBinding mBinding;
     private NewsFragmentPagerAdapter mAdapter;
     private ViewPager mViewPager;
-    private String mUserInput;
 
     private static final String TAG = "MainActivity";
     private static final String GUARDIAN_URL = "https://content.guardianapis.com/search";
     private static final String API_KEY = "test";
     private static final String USER_INPUT_KEY = "userInput";
 
-    private OnNewsQueryComplete mOnNewsQueryComplete = null;
-    private Queue<FragmentArgs> mFragmentLoadingQueue = new LinkedList<>();
+    private OnApiDataReceived mApiDataReceiver = null;
+    private Queue<FragmentArgs> mFragmentApiLoadingQueue = new LinkedList<>();
 
     private static class FragmentArgs {
         private Fragment mFragment;
@@ -60,32 +57,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Inflate the View
         super.onCreate(savedInstanceState);
         mBinding = ActivityMainBinding.inflate(getLayoutInflater());
         View root = mBinding.getRoot();
         setContentView(root);
 
-        Log.d(TAG, "onCreate: " + (savedInstanceState==null));
-        // Load all saved data
         if (savedInstanceState != null
                 && savedInstanceState.getString(USER_INPUT_KEY) != null) {
             mBinding.activityMainTextInput.setText(savedInstanceState.getString(USER_INPUT_KEY));
         }
 
-        // Create the view pager
         mViewPager = mBinding.activityMainViewPager;
-        mAdapter = new NewsFragmentPagerAdapter(getSupportFragmentManager());
-        mViewPager.setAdapter(mAdapter);
-
-        // Listen for user input and update any API queries
-        attachTextChangedListener();
+        reloadGuardianApiData();
+        onUserQueryInput();
     }
 
-    private void attachTextChangedListener() {
-        /*
-         * When the user types in the text we are refreshing the data from the Guardian
-         * */
+    private void onUserQueryInput() {
         mBinding.activityMainTextInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -97,13 +84,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             public void afterTextChanged(Editable s) {
-                // clear any loading queue
-                mFragmentLoadingQueue.clear();
-                // Reload the data from the Guardian.
-                mAdapter = new NewsFragmentPagerAdapter(getSupportFragmentManager());
-                mViewPager.setAdapter(mAdapter);
+                mFragmentApiLoadingQueue.clear();
+                reloadGuardianApiData();
             }
         });
+    }
+
+    private void reloadGuardianApiData() {
+        mAdapter = new NewsFragmentPagerAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mAdapter);
     }
 
     private void restartLoader() {
@@ -114,13 +103,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @NonNull
     @Override
     public Loader<NewsResponse> onCreateLoader(int id, @Nullable Bundle args) {
-        /*
-         * Get the query from the UI input
-         * */
         String query = mBinding.activityMainTextInput.getText().toString();
-        /*
-         * Build the URI Query
-         * */
+
         Uri uri = Uri.parse(GUARDIAN_URL);
         Uri.Builder uriBuilder = uri.buildUpon();
         int currentPage = 1;
@@ -145,27 +129,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<NewsResponse> loader, NewsResponse data) {
-        // After a new URI request has finished we load the data into the first fragment always
-        if (mOnNewsQueryComplete != null) {
+        if (mApiDataReceiver != null) {
             // probably no internet connection
             if (data == null) {
-                mOnNewsQueryComplete.onNewsQueryComplete(null);
+                mApiDataReceiver.onApiDataReceived(null);
                 // nothing else to do here
                 return;
             } else {
                 // data is loaded call the waiting fragment
-                mOnNewsQueryComplete.onNewsQueryComplete(data.getNews());
+                mApiDataReceiver.onApiDataReceived(data.getNews());
             }
 
             // the queue will be cleared if the activity gets destroyed and then resumed
             // so check the size before queueing a fragment for data
-            if (mFragmentLoadingQueue.size() > 0) {
-                // remove the fragment and start the next loading if there is a queue
-                mFragmentLoadingQueue.remove();
-                // push the next fragment for loading
-                pushQueuedFragmentLoading(mFragmentLoadingQueue.peek());
+            if (mFragmentApiLoadingQueue.size() > 0) {
+                mFragmentApiLoadingQueue.remove();
+                sendDataToQueuedFragment(mFragmentApiLoadingQueue.peek());
 
-                // only need to set the pager count when the first page loads
+                // only need to set the page count when the first page loads
                 if (data.getCurrentPage() == 1) {
                     mAdapter.setCount(data.getTotalPages());
                 }
@@ -197,7 +178,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PreferenceActivity.REQUEST_UPDATE)
+        // fetch the Api data again when the user presses the device physical button
+        if (requestCode == PreferenceActivity.REQUEST_UPDATE_CODE)
             restartLoader();
     }
 
@@ -205,33 +187,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * Adds the fragment to a queue with http queries.
      * All the pager adapter fragments will be added to a queue in order to receive their
      * respective news data in a queued fashion. This is done because there is only one
-     * Loader responsible for queries which can get only one query at a time.
+     * Loader responsible for queries which can get only one request at a time.
      */
-    public void registerFragmentForLoader(Fragment fragment, Bundle args) {
-        // first fragment is always retrieving data until its removed from the queue
+    public void enqueueForApiData(Fragment fragment, Bundle args) {
         FragmentArgs fragmentArgs = new FragmentArgs(fragment, args);
-        mFragmentLoadingQueue.add(fragmentArgs);
-        pushQueuedFragmentLoading(fragmentArgs);
+        mFragmentApiLoadingQueue.add(fragmentArgs);
+        sendDataToQueuedFragment(fragmentArgs);
     }
 
-    private void pushQueuedFragmentLoading(FragmentArgs fragmentArgs) {
+    private void sendDataToQueuedFragment(FragmentArgs fragmentArgs) {
         // allow only one loading at a time so that
-        // non of the fragments can cancel the http query
-        if (mFragmentLoadingQueue.size() == 1) {
+        // none of the fragments can cancel the http query
+        if (mFragmentApiLoadingQueue.size() == 1) {
             // start loading
             LoaderManager loaderManager = LoaderManager.getInstance(this);
             loaderManager.restartLoader(0, fragmentArgs.getArgs(), this);
             // attach the fragment with the loading listener
-            mOnNewsQueryComplete = (OnNewsQueryComplete) fragmentArgs.getFragment();
+            mApiDataReceiver = (OnApiDataReceived) fragmentArgs.getFragment();
         }
     }
 
-    /**
-     * Implement this interface to receive a data of news when the loader has finished
-     * retrieving data.
-     */
-    public interface OnNewsQueryComplete {
-        void onNewsQueryComplete(ArrayList<News> newsData);
+    public interface OnApiDataReceived {
+        void onApiDataReceived(ArrayList<News> newsData);
     }
 
     @Override
