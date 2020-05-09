@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,8 +35,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String API_KEY = "test";
     private static final String USER_INPUT_KEY = "userInput";
 
-    private OnApiDataReceived mApiDataReceiver = null;
-    private Queue<FragmentArgs> mFragmentApiLoadingQueue = new LinkedList<>();
+    private OnApiDataReceived mApiDataHandler = null;
+    private Queue<FragmentArgs> mFragmentApiLoadingQueue;
 
     private static class FragmentArgs {
         private Fragment mFragment;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         mViewPager = mBinding.activityMainViewPager;
-        reloadGuardianApiData();
+
         onUserQueryInput();
     }
 
@@ -95,9 +96,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mViewPager.setAdapter(mAdapter);
     }
 
-    private void restartLoader() {
-        LoaderManager loaderManager = LoaderManager.getInstance(this);
-        loaderManager.restartLoader(0, null, this);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mFragmentApiLoadingQueue = new LinkedList<>();
+        reloadGuardianApiData();
     }
 
     @NonNull
@@ -129,15 +132,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<NewsResponse> loader, NewsResponse data) {
-        if (mApiDataReceiver != null) {
+        if (mApiDataHandler != null) {
             // probably no internet connection
             if (data == null) {
-                mApiDataReceiver.onApiDataReceived(null);
+                mApiDataHandler.handleReceivedApiData(null);
                 // nothing else to do here
                 return;
             } else {
                 // data is loaded call the waiting fragment
-                mApiDataReceiver.onApiDataReceived(data.getNews());
+                mApiDataHandler.handleReceivedApiData(data.getNews());
             }
 
             // the queue will be cleared if the activity gets destroyed and then resumed
@@ -175,14 +178,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return false;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // fetch the Api data again when the user presses the device physical button
-        if (requestCode == PreferenceActivity.REQUEST_UPDATE_CODE)
-            restartLoader();
-    }
-
     /**
      * Adds the fragment to a queue with http queries.
      * All the pager adapter fragments will be added to a queue in order to receive their
@@ -203,12 +198,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             LoaderManager loaderManager = LoaderManager.getInstance(this);
             loaderManager.restartLoader(0, fragmentArgs.getArgs(), this);
             // attach the fragment with the loading listener
-            mApiDataReceiver = (OnApiDataReceived) fragmentArgs.getFragment();
+            mApiDataHandler = (OnApiDataReceived) fragmentArgs.getFragment();
         }
     }
 
     public interface OnApiDataReceived {
-        void onApiDataReceived(ArrayList<News> newsData);
+        void handleReceivedApiData(ArrayList<News> newsData);
     }
 
     @Override
@@ -217,4 +212,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         outState.putString(USER_INPUT_KEY, value);
         super.onSaveInstanceState(outState);
     }
+
 }

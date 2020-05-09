@@ -24,7 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".PreferenceActivity"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity"
+            tools:targetApi="jelly_bean" />
     </application>
 
 </manifest>

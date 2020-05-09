@@ -1,5 +1,7 @@
 package android.ivo.newsapp;
 
+import android.content.Context;
+import android.content.Intent;
 import android.ivo.newsapp.databinding.NewsFragmentContainerBinding;
 import android.os.Bundle;
 import android.util.Log;
@@ -93,7 +95,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
     }
 
     @Override
-    public void onApiDataReceived(ArrayList<News> newsData) {
+    public void handleReceivedApiData(ArrayList<News> newsData) {
         if (newsData == null) {
             // No incoming data. Check if there is network connection
             if (!HttpUtilities.clientIsConnectedToNetwork(requireContext()))
@@ -134,4 +136,8 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
         goneView.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

@@ -3,6 +3,7 @@ package android.ivo.newsapp;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.preference.Preference;
 
@@ -49,10 +50,4 @@ public class PreferenceActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        // Request update tells the main activity to do an Guardian API query
-        Intent i = new Intent(this, MainActivity.class);
-        startActivityForResult(i, REQUEST_UPDATE_CODE);
-    }
 }
