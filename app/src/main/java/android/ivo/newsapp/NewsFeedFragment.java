@@ -55,6 +55,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
         mBinding = NewsFragmentContainerBinding.inflate(inflater, container, false);
         initRecyclerView();
         fetchApiData();
+        displayLoadingIndicator(true);
         return mBinding.getRoot();
     }
 
@@ -112,18 +113,25 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
     }
 
     private void displayUiPageState(int state) {
-        TextView textDisplay = mBinding.activityMainEmptyInfoText;
-        View layout = mBinding.activityMainLayout;
+        TextView infoText = mBinding.listInfoText;
+        View layout = mBinding.recyclerView;
+
+        displayLoadingIndicator(false);
 
         if (state == State.EMPTY) {
-            swapVisibility(layout, textDisplay);
-            textDisplay.setText(getString(R.string.feedback_message_no_data));
+            swapVisibility(layout, infoText);
+            infoText.setText(getString(R.string.feedback_message_no_data));
         } else if (state == State.VISIBLE) {
-            swapVisibility(textDisplay, layout);
+            swapVisibility(infoText, layout);
         } else if (state == State.NO_NETWORK) {
-            swapVisibility(layout, textDisplay);
-            textDisplay.setText(getString(R.string.feedback_message_no_network));
+            swapVisibility(layout, infoText);
+            infoText.setText(getString(R.string.feedback_message_no_network));
         }
+    }
+
+    private void displayLoadingIndicator(boolean value) {
+        int visibility = (value) ? View.VISIBLE : View.GONE;
+        mBinding.listProgressBar.setVisibility(visibility);
     }
 
     /**

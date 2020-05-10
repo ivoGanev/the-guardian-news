@@ -16,7 +16,6 @@
         android:textSize="@dimen/text_size_large"
         tools:text="News feed title" />
 
-
         <TextView
             android:id="@+id/news_feed_byline"
             android:layout_width="wrap_content"
@@ -28,9 +27,7 @@
             android:id="@+id/news_feed_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             tools:text="1.01.2020" />
-
 
     <TextView
         android:id="@+id/news_feed_section"
