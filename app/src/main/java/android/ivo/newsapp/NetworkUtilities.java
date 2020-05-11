@@ -12,11 +12,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Scanner;
 
-final class HttpUtilities {
+final class NetworkUtilities {
     private static final String TAG = "HttpHandler";
 
-    private HttpUtilities() {
+    private NetworkUtilities() {
     }
 
     static boolean clientIsConnectedToNetwork(Context context)
@@ -35,7 +36,7 @@ final class HttpUtilities {
     static String retrieveJsonData(String urlString) throws IOException {
         String json = "";
         HttpURLConnection httpURLConnection;
-        InputStream stream;
+        InputStream in;
 
         URL url = stringToURL(urlString);
 
@@ -46,22 +47,19 @@ final class HttpUtilities {
         httpURLConnection.connect();
 
         if (httpURLConnection.getResponseCode() == 200) {
-            //OK
-            stream = httpURLConnection.getInputStream();
+            // Connection established
+            in = httpURLConnection.getInputStream();
 
-            StringBuilder stringBuilder = new StringBuilder();
-            InputStreamReader reader = new InputStreamReader(stream);
-            BufferedReader r = new BufferedReader(reader);
+            Scanner scanner = new Scanner(in);
+            scanner.useDelimiter("\\A");
 
-            String line = r.readLine();
-            while (line != null) {
-                stringBuilder.append(line);
-                line = r.readLine();
+            boolean hasInput = scanner.hasNext();
+            if (hasInput) {
+                json = scanner.next();
             }
 
-            stream.close();
+            in.close();
             httpURLConnection.disconnect();
-            json = stringBuilder.toString();
 
         } else {
             Log.e(TAG, "retrieveJsonData: Connection response code: " + httpURLConnection.getResponseCode());

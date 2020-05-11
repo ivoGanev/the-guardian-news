@@ -14,6 +14,9 @@ import android.content.SharedPreferences;
 import android.ivo.newsapp.databinding.ActivityMainBinding;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -77,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mBinding.activityMainTextInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO: Wait for a second or two after the user has pressed the buttons so that we don't use too many requests
+                mFragmentApiLoadingQueue.clear();
+                reloadGuardianApiData();
             }
 
             @Override
@@ -85,8 +91,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             public void afterTextChanged(Editable s) {
-                mFragmentApiLoadingQueue.clear();
-                reloadGuardianApiData();
+
             }
         });
     }

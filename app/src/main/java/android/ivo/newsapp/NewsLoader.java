@@ -28,7 +28,7 @@ class NewsLoader extends AsyncTaskLoader<NewsResponse> {
     public NewsResponse loadInBackground() {
         NewsResponse newsResponse = null;
         try {
-            String json = HttpUtilities.retrieveJsonData(mUri);
+            String json = NetworkUtilities.retrieveJsonData(mUri);
             newsResponse = BindJsonData(json);
 
         } catch (IOException e) {

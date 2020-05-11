@@ -1,6 +1,5 @@
 package android.ivo.newsapp;
 
-import android.content.Context;
 import android.content.Intent;
 import android.ivo.newsapp.databinding.NewsFragmentContainerBinding;
 import android.os.Bundle;
@@ -99,7 +98,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
     public void handleReceivedApiData(ArrayList<News> newsData) {
         if (newsData == null) {
             // No incoming data. Check if there is network connection
-            if (!HttpUtilities.clientIsConnectedToNetwork(requireContext()))
+            if (!NetworkUtilities.clientIsConnectedToNetwork(requireContext()))
                 displayUiPageState(State.NO_NETWORK);
                 // if the connection is OK, there is no data coming from the API
             else
