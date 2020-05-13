@@ -38,8 +38,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String API_KEY = "test";
     private static final String USER_INPUT_KEY = "userInput";
 
+    /** This will simply delay the reloading of any news while the user types, until the given
+     * threshold. The threshold is in milliseconds */
+    private static final long UPDATE_NEWS_DELAY_THRESHOLD = 500;
+
     private OnApiDataReceived mApiDataHandler = null;
     private Queue<FragmentArgs> mFragmentApiLoadingQueue;
+    private RunLastDelayedTask mRunLastDelayedTask;
+    private Handler mInputDelayHandler;
 
     private static class FragmentArgs {
         private Fragment mFragment;
@@ -74,15 +80,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mViewPager = mBinding.activityMainViewPager;
 
         onUserQueryInput();
+
+        mRunLastDelayedTask = new RunLastDelayedTask(UPDATE_NEWS_DELAY_THRESHOLD, new Runnable() {
+            @Override
+            public void run() {
+                mInputDelayHandler.sendEmptyMessage(0);
+            }
+        });
+
+        mInputDelayHandler = new Handler(getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                mFragmentApiLoadingQueue.clear();
+                reloadGuardianApiData();
+            }
+        };
     }
 
     private void onUserQueryInput() {
         mBinding.activityMainTextInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // TODO: Wait for a second or two after the user has pressed the buttons so that we don't use too many requests
-                mFragmentApiLoadingQueue.clear();
-                reloadGuardianApiData();
+
             }
 
             @Override
@@ -91,7 +110,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                Thread thread = new Thread(mRunLastDelayedTask);
+                thread.start();
             }
         });
     }
@@ -184,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
+     * Doing simple network chaining calls with a <code>Queue</code>.
      * Adds the fragment to a queue with http queries.
      * All the pager adapter fragments will be added to a queue in order to receive their
      * respective news data in a queued fashion. This is done because there is only one
