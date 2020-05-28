@@ -1,12 +1,9 @@
 package android.ivo.newsapp;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.ivo.newsapp.databinding.NewsFeedElementBinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,12 +12,9 @@ import java.util.List;
 
 public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
     private List<News> mNews;
-    private OnClickListener mClickListener;
 
-    NewsRecyclerViewAdapter(List<News> news, OnClickListener clickListener)
-    {
+    NewsRecyclerViewAdapter(List<News> news) {
         mNews = news;
-        mClickListener = clickListener;
     }
 
     void addAll(List<News> news) {
@@ -36,62 +30,34 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final NewsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final NewsViewHolder holder, final int position) {
         final News news = mNews.get(position);
+        NewsFeedElementBinding binding = holder.binding;
 
-        holder.titleView.setText(news.getTitle());
-        holder.dateView.setText(news.getPublicationDate());
-        holder.sectionName.setText(news.getSectionName());
+        binding.newsFeedTitle.setText(news.getTitle());
+        binding.newsFeedDate.setText(news.getPublicationDate());
+        binding.newsFeedSection.setText(news.getSectionName());
 
         String byline = news.getByline();
         if (byline != null)
-            holder.byline.setText(news.getByline());
+            binding.newsFeedByline.setText(news.getByline());
         else
-            holder.byline.setVisibility(View.GONE);
-
-//        holder.rootView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
-//                holder.rootView.getContext().startActivity(intent);
-//            }
-//        });
+            binding.newsFeedByline.setVisibility(View.GONE);
     }
 
     @Override
     public int getItemCount() {
-        if(mNews!=null)
+        if (mNews != null)
             return mNews.size();
         return 0;
     }
 
-    class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        final TextView sectionName;
-        final TextView titleView;
-        final TextView dateView;
-        final TextView byline;
-
-        View rootView;
+    static class NewsViewHolder extends RecyclerView.ViewHolder {
+        final NewsFeedElementBinding binding;
 
         NewsViewHolder(@NonNull View itemView) {
             super(itemView);
-            dateView = itemView.findViewById(R.id.news_feed_date);
-            titleView = itemView.findViewById(R.id.news_feed_title);
-            sectionName = itemView.findViewById(R.id.news_feed_section);
-            byline = itemView.findViewById(R.id.news_feed_byline);
-
-            itemView.setOnClickListener(this);
-            rootView = itemView;
+            binding = NewsFeedElementBinding.bind(itemView);
         }
-
-        @Override
-        public void onClick(View v) {
-            mClickListener.onClick(getAdapterPosition());
-        }
-    }
-
-    interface OnClickListener
-    {
-        void onClick(int position);
     }
 }

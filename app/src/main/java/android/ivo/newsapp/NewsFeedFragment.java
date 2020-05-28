@@ -1,6 +1,5 @@
 package android.ivo.newsapp;
 
-import android.content.Intent;
 import android.ivo.newsapp.databinding.NewsFragmentContainerBinding;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,7 +20,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived, NewsRecyclerViewAdapter.OnClickListener{
+public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived{
     private static final String TAG = "NewsFeedFragment";
     private NewsFragmentContainerBinding mBinding;
     private NewsRecyclerViewAdapter mNewsAdapter;
@@ -76,7 +75,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
 
     private void initRecyclerView() {
         RecyclerView newsRecyclerView = mBinding.recyclerView;
-        mNewsAdapter = new NewsRecyclerViewAdapter(mPageNews, this);
+        mNewsAdapter = new NewsRecyclerViewAdapter(mPageNews);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
         newsRecyclerView.addItemDecoration(
@@ -141,10 +140,5 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
     private void swapVisibility(View visibleView, View goneView) {
         visibleView.setVisibility(View.GONE);
         goneView.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onClick(int position) {
-        Log.d(TAG, "onClick: " + position);
     }
 }
