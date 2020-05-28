@@ -78,6 +78,5 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
             rootView = itemView;
         }
-
     }
 }

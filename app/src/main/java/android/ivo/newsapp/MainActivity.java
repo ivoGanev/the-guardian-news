@@ -204,7 +204,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * Doing simple network chaining calls with a <code>Queue</code>.
+     * This method is doing simple network chaining calls, queueing all the fragments in a list
+     * that request the api data.
+     *
      * Adds the fragment to a queue with http queries.
      * All the pager adapter fragments will be added to a queue in order to receive their
      * respective news data in a queued fashion. This is done because there is only one

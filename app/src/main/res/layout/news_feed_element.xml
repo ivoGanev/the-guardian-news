@@ -9,6 +9,7 @@
     android:padding="@dimen/spacing_normal">
 
     <TextView
+        android:layout_gravity="center_vertical"
         android:id="@+id/news_feed_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,22 +17,29 @@
         android:textSize="@dimen/text_size_large"
         tools:text="News feed title" />
 
-        <TextView
-            android:id="@+id/news_feed_byline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Janet Murphy"
-            />
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/news_extra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/news_feed_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="1.01.2020" />
+    <TextView
+        android:id="@+id/news_feed_byline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Janet Murphy" />
+
+    <TextView
+        android:id="@+id/news_feed_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="1.01.2020" />
 
     <TextView
         android:id="@+id/news_feed_section"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="Technology" />
+    </LinearLayout>
 </LinearLayout>
