@@ -1,5 +1,6 @@
 package android.ivo.newsapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -14,9 +15,12 @@ import java.util.List;
 
 public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
     private List<News> mNews;
+    private OnClickListener mClickListener;
 
-    NewsRecyclerViewAdapter(List<News> news) {
+    NewsRecyclerViewAdapter(List<News> news, OnClickListener clickListener)
+    {
         mNews = news;
+        mClickListener = clickListener;
     }
 
     void addAll(List<News> news) {
@@ -45,13 +49,13 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
         else
             holder.byline.setVisibility(View.GONE);
 
-        holder.rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
-                holder.rootView.getContext().startActivity(intent);
-            }
-        });
+//        holder.rootView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
+//                holder.rootView.getContext().startActivity(intent);
+//            }
+//        });
     }
 
     @Override
@@ -61,7 +65,7 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
         return 0;
     }
 
-    static class NewsViewHolder extends RecyclerView.ViewHolder {
+    class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final TextView sectionName;
         final TextView titleView;
         final TextView dateView;
@@ -76,7 +80,18 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
             sectionName = itemView.findViewById(R.id.news_feed_section);
             byline = itemView.findViewById(R.id.news_feed_byline);
 
+            itemView.setOnClickListener(this);
             rootView = itemView;
         }
+
+        @Override
+        public void onClick(View v) {
+            mClickListener.onClick(getAdapterPosition());
+        }
+    }
+
+    interface OnClickListener
+    {
+        void onClick(int position);
     }
 }

@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<NewsResponse> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<NewsResponse>{
     private ActivityMainBinding mBinding;
     private NewsFragmentPagerAdapter mAdapter;
     private ViewPager mViewPager;
@@ -240,5 +240,4 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         outState.putString(USER_INPUT_KEY, value);
         super.onSaveInstanceState(outState);
     }
-
 }

@@ -21,7 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived {
+public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived, NewsRecyclerViewAdapter.OnClickListener{
     private static final String TAG = "NewsFeedFragment";
     private NewsFragmentContainerBinding mBinding;
     private NewsRecyclerViewAdapter mNewsAdapter;
@@ -76,7 +76,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
 
     private void initRecyclerView() {
         RecyclerView newsRecyclerView = mBinding.recyclerView;
-        mNewsAdapter = new NewsRecyclerViewAdapter(mPageNews);
+        mNewsAdapter = new NewsRecyclerViewAdapter(mPageNews, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
         newsRecyclerView.addItemDecoration(
@@ -144,7 +144,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onClick(int position) {
+        Log.d(TAG, "onClick: " + position);
     }
 }
