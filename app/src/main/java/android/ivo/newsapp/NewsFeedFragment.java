@@ -82,6 +82,8 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
                 new DividerItemDecoration(requireContext(),
                         linearLayoutManager.getOrientation()));
         newsRecyclerView.setLayoutManager(linearLayoutManager);
+        mNewsAdapter.setHasStableIds(true);
+
         newsRecyclerView.setAdapter(mNewsAdapter);
     }
 

@@ -1,6 +1,7 @@
 package android.ivo.newsapp;
 
 import android.ivo.newsapp.databinding.NewsFeedElementBinding;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
+public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> implements View.OnClickListener {
     private List<News> mNews;
 
     NewsRecyclerViewAdapter(List<News> news) {
@@ -26,7 +27,10 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     @Override
     public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_feed_element, parent, false);
-        return new NewsViewHolder(view);
+        NewsViewHolder holder = new NewsViewHolder(view);
+        view.setOnClickListener(this);
+        view.setTag(holder);
+        return holder;
     }
 
     @Override
@@ -43,6 +47,12 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
             binding.newsFeedByline.setText(news.getByline());
         else
             binding.newsFeedByline.setVisibility(View.GONE);
+
+    }
+
+    @Override
+    public long getItemId(int position) {
+       return mNews.get(position).hashCode();
     }
 
     @Override
@@ -50,6 +60,18 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
         if (mNews != null)
             return mNews.size();
         return 0;
+    }
+
+    @Override
+    public void onClick(View v) {
+        NewsViewHolder holder = (NewsViewHolder)v.getTag();
+        View extras = holder.binding.newsExtras;
+
+        if(extras.getVisibility() == View.GONE)
+            extras.setVisibility(View.VISIBLE);
+        else
+            extras.setVisibility(View.GONE);
+        notifyDataSetChanged();
     }
 
     static class NewsViewHolder extends RecyclerView.ViewHolder {
