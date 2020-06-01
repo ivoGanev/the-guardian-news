@@ -27,7 +27,7 @@ public class NewsItemAnimator extends DefaultItemAnimator {
     @Override
     public boolean animateChange(RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
         final NewsRecyclerViewAdapter.NewsViewHolder holder = (NewsRecyclerViewAdapter.NewsViewHolder) oldHolder;
-        // TODO: the animation needs to be done before the user can press the button again
+        // TODO: the previous animation needs to complete before the user can press the button again
         Animation a = new AlphaAnimation(0, 1);
         a.setInterpolator(new DecelerateInterpolator());
         a.setDuration(1500);
