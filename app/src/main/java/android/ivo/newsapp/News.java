@@ -76,7 +76,7 @@ class News {
      */
     public News() {
     }
-    
+
     private News(Builder builder) {
         publicationDate = builder.publicationDate;
         sectionName = builder.sectionName;
