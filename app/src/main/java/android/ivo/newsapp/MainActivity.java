@@ -15,11 +15,7 @@ import android.ivo.newsapp.databinding.ActivityMainBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private OnApiDataReceived mApiDataHandler = null;
     private Queue<FragmentArgs> mFragmentApiLoadingQueue;
-    private RunLastDelayedTask mRunLastDelayedTask;
+    private RunLastDelayedTask delayedTask;
     private Handler mInputDelayHandler;
 
     private static class FragmentArgs {
@@ -79,9 +75,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mViewPager = mBinding.activityMainViewPager;
 
-        onUserQueryInput();
-
-        mRunLastDelayedTask = new RunLastDelayedTask(UPDATE_NEWS_DELAY_THRESHOLD, new Runnable() {
+        delayedTask = new RunLastDelayedTask(UPDATE_NEWS_DELAY_THRESHOLD, new Runnable() {
             @Override
             public void run() {
                 mInputDelayHandler.sendEmptyMessage(0);
@@ -95,25 +89,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 reloadGuardianApiData();
             }
         };
-    }
 
-    private void onUserQueryInput() {
-        mBinding.activityMainTextInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                Thread thread = new Thread(mRunLastDelayedTask);
-                thread.start();
-            }
-        });
+        mBinding.activityMainTextInput.addTextChangedListener(new AfterTextChangeWatcher(delayedTask));
     }
 
     private void reloadGuardianApiData() {
