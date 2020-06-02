@@ -1,2 +1,2 @@
-TODO: 1) Annotate News.java POJO to implement ROOM
+TODO: 1) Test the data b
 TODO: 2) Make use of the relational database to store favourite news

@@ -25,3 +25,5 @@ public abstract class NewsDatabase extends RoomDatabase {
 
     public abstract NewsDao newsDao();
 }
+
+

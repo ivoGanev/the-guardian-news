@@ -71,12 +71,19 @@ class News {
         }
     }
 
+
     /**
      * Do not use this constructor. It is specially created for ROOM. Use the builder instead.
      */
-    public News() {
+    public News(int id, String publicationDate, String sectionName, String title, String httpUrl, String byline) {
+        this.id = id;
+        this.publicationDate = publicationDate;
+        this.sectionName = sectionName;
+        this.title = title;
+        this.httpUrl = httpUrl;
+        this.byline = byline;
     }
-
+    
     private News(Builder builder) {
         publicationDate = builder.publicationDate;
         sectionName = builder.sectionName;
@@ -109,6 +116,10 @@ class News {
 
     String getHttpUrl() {
         return httpUrl;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override
