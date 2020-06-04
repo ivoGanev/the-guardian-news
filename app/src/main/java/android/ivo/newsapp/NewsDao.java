@@ -11,6 +11,8 @@ import java.util.List;
 
 @Dao
 public interface NewsDao{
+
+    // TODO: migrate to LiveData to let the queries run on a seperate thread
     @Query("SELECT * FROM news")
     List<News> getNewsList();
 

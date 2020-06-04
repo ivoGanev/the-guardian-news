@@ -18,6 +18,8 @@ public abstract class NewsDatabase extends RoomDatabase {
         if(instance==null) {
             instance = Room.databaseBuilder(context,NewsDatabase.class, DB_NAME)
                     .fallbackToDestructiveMigration()
+                    // TODO: remove the line bellow when finished with the
+                    //       main thread tests.
                     .allowMainThreadQueries()
                     .build();
         }

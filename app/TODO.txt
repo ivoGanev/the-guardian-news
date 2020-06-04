@@ -1,2 +1,1 @@
-TODO: 1) Test the data base on main thread
-TODO: 2) Make use of the relational database to store favourite news
+TODO: 1) Make use of the relational database to store favourite news
