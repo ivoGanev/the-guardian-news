@@ -13,9 +13,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+<!--        <activity android:name=".DbTestActivityActivity"></activity>-->
         <activity
+            android:name=".DbTestActivityActivity"
             android:launchMode="singleTop"
-            android:name=".MainActivity"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +24,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PreferenceActivity"
+        <activity
+            android:name=".PreferenceActivity"
             android:parentActivityName=".MainActivity"
             tools:targetApi="jelly_bean" />
     </application>

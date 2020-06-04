@@ -14,6 +14,9 @@ public interface NewsDao{
     @Query("SELECT * FROM news")
     List<News> getNewsList();
 
+    @Query("SELECT * FROM news WHERE id=:id")
+    News getNews(int id);
+
     @Insert
     void insertNews(News news);
 

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<NewsResponse>{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<NewsResponse> {
     private ActivityMainBinding mBinding;
     private NewsFragmentPagerAdapter mAdapter;
     private ViewPager mViewPager;
@@ -34,32 +34,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String API_KEY = "test";
     private static final String USER_INPUT_KEY = "userInput";
 
-    /** This will simply delay the reloading of any news while the user types, until the given
-     * threshold. The threshold is in milliseconds */
+    private NewsDatabase newsDatabase;
+    /**
+     * This will simply delay the reloading of any news while the user types, until the given
+     * threshold. The threshold is in milliseconds
+     */
     private static final long UPDATE_NEWS_DELAY_THRESHOLD = 500;
 
     private OnApiDataReceived mApiDataHandler = null;
     private Queue<FragmentArgs> mFragmentApiLoadingQueue;
-    private RunLastDelayedTask delayedTask;
     private Handler mInputDelayHandler;
-
-    private static class FragmentArgs {
-        private Fragment mFragment;
-        private Bundle mArgs;
-
-        FragmentArgs(Fragment fragment, Bundle args) {
-            mFragment = fragment;
-            mArgs = args;
-        }
-
-        Fragment getFragment() {
-            return mFragment;
-        }
-
-        Bundle getArgs() {
-            return mArgs;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mViewPager = mBinding.activityMainViewPager;
 
-        delayedTask = new RunLastDelayedTask(UPDATE_NEWS_DELAY_THRESHOLD, new Runnable() {
+        RunLastDelayedTask delayedTask = new RunLastDelayedTask(UPDATE_NEWS_DELAY_THRESHOLD, new Runnable() {
             @Override
             public void run() {
                 mInputDelayHandler.sendEmptyMessage(0);
@@ -91,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         };
 
         mBinding.activityMainTextInput.addTextChangedListener(new AfterTextChangeWatcher(delayedTask));
+
+        newsDatabase = NewsDatabase.getInstance(this);
     }
 
     private void reloadGuardianApiData() {
@@ -110,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<NewsResponse> onCreateLoader(int id, @Nullable Bundle args) {
         String query = mBinding.activityMainTextInput.getText().toString();
 
-        Uri uri = Uri.parse(GUARDIAN_URL);
+        final Uri uri = Uri.parse(GUARDIAN_URL);
+
         Uri.Builder uriBuilder = uri.buildUpon();
         int currentPage = 1;
         if (args != null)
@@ -183,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     /**
      * This method is doing simple network chaining calls, queueing all the fragments in a list
      * that request the api data.
-     *
+     * <p>
      * Adds the fragment to a queue with http queries.
      * All the pager adapter fragments will be added to a queue in order to receive their
      * respective news data in a queued fashion. This is done because there is only one
@@ -207,6 +194,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        newsDatabase.close();
+    }
+
     public interface OnApiDataReceived {
         void handleReceivedApiData(ArrayList<News> newsData);
     }
@@ -216,5 +209,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         String value = mBinding.activityMainTextInput.getText().toString();
         outState.putString(USER_INPUT_KEY, value);
         super.onSaveInstanceState(outState);
+    }
+
+    private static class FragmentArgs {
+        private Fragment mFragment;
+        private Bundle mArgs;
+
+        FragmentArgs(Fragment fragment, Bundle args) {
+            mFragment = fragment;
+            mArgs = args;
+        }
+
+        Fragment getFragment() {
+            return mFragment;
+        }
+
+        Bundle getArgs() {
+            return mArgs;
+        }
     }
 }
