@@ -1,6 +1,5 @@
 package android.ivo.newsapp;
 
-import android.content.Intent;
 import android.ivo.newsapp.databinding.NewsFragmentContainerBinding;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +12,7 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,7 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived {
+public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived{
     private static final String TAG = "NewsFeedFragment";
     private NewsFragmentContainerBinding mBinding;
     private NewsRecyclerViewAdapter mNewsAdapter;
@@ -83,6 +83,9 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
                 new DividerItemDecoration(requireContext(),
                         linearLayoutManager.getOrientation()));
         newsRecyclerView.setLayoutManager(linearLayoutManager);
+        mNewsAdapter.setHasStableIds(true);
+
+        newsRecyclerView.setItemAnimator(new NewsItemAnimator());
         newsRecyclerView.setAdapter(mNewsAdapter);
     }
 
@@ -91,6 +94,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
         Bundle args = new Bundle();
         args.putInt(CURRENT_PAGE_BUNDLE_KEY, currentPage);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -141,10 +145,5 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
     private void swapVisibility(View visibleView, View goneView) {
         visibleView.setVisibility(View.GONE);
         goneView.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
     }
 }

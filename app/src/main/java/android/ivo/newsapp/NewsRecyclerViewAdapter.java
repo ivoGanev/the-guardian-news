@@ -1,18 +1,21 @@
 package android.ivo.newsapp;
 
-import android.content.Intent;
-import android.net.Uri;
+import android.ivo.newsapp.databinding.NewsFeedElementBinding;
+import android.service.voice.AlwaysOnHotwordDetector;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.animation.Animation;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
+public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> implements View.OnClickListener {
+    private static final String TAG = NewsRecyclerViewAdapter.class.getSimpleName();
     private List<News> mNews;
 
     NewsRecyclerViewAdapter(List<News> news) {
@@ -28,56 +31,67 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     @Override
     public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_feed_element, parent, false);
-        return new NewsViewHolder(view);
+        NewsViewHolder holder = new NewsViewHolder(view);
+        view.setOnClickListener(this);
+        view.setTag(holder);
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final NewsViewHolder holder, int position) {
-        final News news = mNews.get(position);
+    public void onBindViewHolder(@NonNull NewsViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if(payloads.isEmpty())
+            onBindViewHolder(holder, position);
+        else {
+            if(payloads.contains("visibility")) {
+                View extras = holder.binding.newsExtras;
+                if(extras.getVisibility() == View.GONE)
+                    extras.setVisibility(View.VISIBLE);
+                else
+                    extras.setVisibility(View.GONE);
+            }
+        }
+    }
 
-        holder.titleView.setText(news.getTitle());
-        holder.dateView.setText(news.getPublicationDate());
-        holder.sectionName.setText(news.getSectionName());
+    @Override
+    public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
+        final News news = mNews.get(position);
+        NewsFeedElementBinding binding = holder.binding;
+        
+        binding.newsFeedTitle.setText(news.getTitle());
+        binding.newsFeedDate.setText(news.getPublicationDate());
+        binding.newsFeedSection.setText(news.getSectionName());
 
         String byline = news.getByline();
         if (byline != null)
-            holder.byline.setText(news.getByline());
+            binding.newsFeedByline.setText(news.getByline());
         else
-            holder.byline.setVisibility(View.GONE);
+            binding.newsFeedByline.setVisibility(View.GONE);
+    }
 
-        holder.rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
-                holder.rootView.getContext().startActivity(intent);
-            }
-        });
+    @Override
+    public long getItemId(int position) {
+       return mNews.get(position).hashCode();
     }
 
     @Override
     public int getItemCount() {
-        if(mNews!=null)
+        if (mNews != null)
             return mNews.size();
         return 0;
     }
 
-    static class NewsViewHolder extends RecyclerView.ViewHolder {
-        final TextView sectionName;
-        final TextView titleView;
-        final TextView dateView;
-        final TextView byline;
+    @Override
+    public void onClick(View v) {
+        NewsViewHolder holder = (NewsViewHolder)v.getTag();
+        notifyItemChanged(holder.getAdapterPosition(), "visibility");
+    }
 
-        View rootView;
+    static class NewsViewHolder extends RecyclerView.ViewHolder {
+        final NewsFeedElementBinding binding;
 
         NewsViewHolder(@NonNull View itemView) {
             super(itemView);
-            dateView = itemView.findViewById(R.id.news_feed_date);
-            titleView = itemView.findViewById(R.id.news_feed_title);
-            sectionName = itemView.findViewById(R.id.news_feed_section);
-            byline = itemView.findViewById(R.id.news_feed_byline);
-
-            rootView = itemView;
+            binding = NewsFeedElementBinding.bind(itemView);
         }
-
     }
 }
