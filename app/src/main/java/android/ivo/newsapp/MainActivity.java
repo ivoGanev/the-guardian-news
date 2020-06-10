@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String TAG = "MainActivity";
     private static final String GUARDIAN_URL = "https://content.guardianapis.com/search";
-    private static final String API_KEY = "test";
+    private static final String API_KEY = BuildConfig.API_KEY;
     private static final String USER_INPUT_KEY = "userInput";
 
     /** This will simply delay the reloading of any news while the user types, until the given
