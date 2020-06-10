@@ -39,7 +39,7 @@ final class NetworkUtilities {
         InputStream in;
 
         URL url = stringToURL(urlString);
-
+        Log.d(TAG, "retrieveJsonData: " + url.toString());
         httpURLConnection = (HttpURLConnection) url.openConnection();
         httpURLConnection.setRequestMethod("GET");
         httpURLConnection.setConnectTimeout(5000);
@@ -60,8 +60,11 @@ final class NetworkUtilities {
 
             in.close();
             httpURLConnection.disconnect();
-
-        } else {
+        }
+        else if(httpURLConnection.getResponseCode() == 429) {
+            Log.e(TAG, "retrieveJsonData: API rate limit exceeded");
+        }
+        else {
             Log.e(TAG, "retrieveJsonData: Connection response code: " + httpURLConnection.getResponseCode());
         }
 
