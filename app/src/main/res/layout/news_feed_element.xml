@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:id="@+id/news_feed_layout"
     android:padding="@dimen/spacing_normal">
 
     <TextView
@@ -54,7 +55,9 @@
             app:layout_constraintTop_toBottomOf="@+id/news_feed_date"
             tools:text="Technology" />
 
-        <ImageView
+        <ImageButton
+            android:clickable="true"
+            android:id="@+id/news_feed_btn_html"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"

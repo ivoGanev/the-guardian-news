@@ -240,4 +240,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         outState.putString(USER_INPUT_KEY, value);
         super.onSaveInstanceState(outState);
     }
+
 }
