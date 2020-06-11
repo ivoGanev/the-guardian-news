@@ -1,15 +1,11 @@
 package android.ivo.newsapp;
 
 import android.ivo.newsapp.databinding.NewsFeedElementBinding;
-import android.service.voice.AlwaysOnHotwordDetector;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -39,12 +35,12 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull NewsViewHolder holder, int position, @NonNull List<Object> payloads) {
-        if(payloads.isEmpty())
+        if (payloads.isEmpty())
             onBindViewHolder(holder, position);
         else {
-            if(payloads.contains("visibility")) {
+            if (payloads.contains("visibility")) {
                 View extras = holder.binding.newsExtras;
-                if(extras.getVisibility() == View.GONE)
+                if (extras.getVisibility() == View.GONE)
                     extras.setVisibility(View.VISIBLE);
                 else
                     extras.setVisibility(View.GONE);
@@ -56,7 +52,7 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
         final News news = mNews.get(position);
         NewsFeedElementBinding binding = holder.binding;
-        
+
         binding.newsFeedTitle.setText(news.getTitle());
         binding.newsFeedDate.setText(news.getPublicationDate());
         binding.newsFeedSection.setText(news.getSectionName());
@@ -70,7 +66,7 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
     @Override
     public long getItemId(int position) {
-       return mNews.get(position).hashCode();
+        return mNews.get(position).hashCode();
     }
 
     @Override
@@ -82,7 +78,7 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
     @Override
     public void onClick(View v) {
-        NewsViewHolder holder = (NewsViewHolder)v.getTag();
+        NewsViewHolder holder = (NewsViewHolder) v.getTag();
         notifyItemChanged(holder.getAdapterPosition(), "visibility");
     }
 
