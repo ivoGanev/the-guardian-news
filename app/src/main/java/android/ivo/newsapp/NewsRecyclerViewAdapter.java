@@ -1,29 +1,28 @@
 package android.ivo.newsapp;
 
 import android.ivo.newsapp.databinding.NewsFeedElementBinding;
-import android.service.voice.AlwaysOnHotwordDetector;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> implements View.OnClickListener {
+public class NewsRecyclerViewAdapter
+        extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
+
+    private OnViewClickedListener onViewClickedListener;
     private static final String TAG = NewsRecyclerViewAdapter.class.getSimpleName();
-    private List<News> mNews;
+    private List<News> news;
 
     NewsRecyclerViewAdapter(List<News> news) {
-        mNews = news;
+        this.news = news;
     }
 
     void addAll(List<News> news) {
-        mNews = news;
+        this.news = news;
         notifyDataSetChanged();
     }
 
@@ -31,20 +30,19 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     @Override
     public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_feed_element, parent, false);
-        NewsViewHolder holder = new NewsViewHolder(view);
-        view.setOnClickListener(this);
+        final NewsViewHolder holder = new NewsViewHolder(view);
         view.setTag(holder);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull NewsViewHolder holder, int position, @NonNull List<Object> payloads) {
-        if(payloads.isEmpty())
+        if (payloads.isEmpty())
             onBindViewHolder(holder, position);
         else {
-            if(payloads.contains("visibility")) {
+            if (payloads.contains("visibility")) {
                 View extras = holder.binding.newsExtras;
-                if(extras.getVisibility() == View.GONE)
+                if (extras.getVisibility() == View.GONE)
                     extras.setVisibility(View.VISIBLE);
                 else
                     extras.setVisibility(View.GONE);
@@ -53,10 +51,10 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
-        final News news = mNews.get(position);
+    public void onBindViewHolder(@NonNull NewsViewHolder holder, final int position) {
+        final News news = this.news.get(position);
         NewsFeedElementBinding binding = holder.binding;
-        
+
         binding.newsFeedTitle.setText(news.getTitle());
         binding.newsFeedDate.setText(news.getPublicationDate());
         binding.newsFeedSection.setText(news.getSectionName());
@@ -70,28 +68,42 @@ public class NewsRecyclerViewAdapter extends RecyclerView.Adapter<NewsRecyclerVi
 
     @Override
     public long getItemId(int position) {
-       return mNews.get(position).hashCode();
+        return news.get(position).hashCode();
     }
 
     @Override
     public int getItemCount() {
-        if (mNews != null)
-            return mNews.size();
+        if (news != null)
+            return news.size();
         return 0;
     }
 
-    @Override
-    public void onClick(View v) {
-        NewsViewHolder holder = (NewsViewHolder)v.getTag();
-        notifyItemChanged(holder.getAdapterPosition(), "visibility");
-    }
-
-    static class NewsViewHolder extends RecyclerView.ViewHolder {
+    class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final NewsFeedElementBinding binding;
 
         NewsViewHolder(@NonNull View itemView) {
             super(itemView);
             binding = NewsFeedElementBinding.bind(itemView);
+            itemView.setOnClickListener(this);
+            binding.newsFeedBtnHtml.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            int id = v.getId();
+            if (id == R.id.news_feed_btn_html) {
+                onViewClickedListener.onHttpButtonClicked(news.get(getAdapterPosition()), v);
+            } else if (id == R.id.news_feed_layout) {
+                notifyItemChanged(getAdapterPosition(), "visibility");
+            }
+        }
+    }
+
+    public void setOnViewClickedListener(OnViewClickedListener listener) {
+        this.onViewClickedListener = listener;
+    }
+
+    interface OnViewClickedListener {
+        void onHttpButtonClicked(News news, View view);
     }
 }

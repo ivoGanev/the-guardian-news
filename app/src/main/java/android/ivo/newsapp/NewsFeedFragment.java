@@ -1,6 +1,8 @@
 package android.ivo.newsapp;
 
+import android.content.Intent;
 import android.ivo.newsapp.databinding.NewsFragmentContainerBinding;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +23,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived{
+public class NewsFeedFragment extends Fragment
+        implements MainActivity.OnApiDataReceived,
+        NewsRecyclerViewAdapter.OnViewClickedListener {
+
+    @Override
+    public void onHttpButtonClicked(News news, View view) {
+        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
+        startActivity(i);
+    }
+
     private static final String TAG = "NewsFeedFragment";
     private NewsFragmentContainerBinding mBinding;
     private NewsRecyclerViewAdapter mNewsAdapter;
@@ -68,8 +79,8 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
         args.putInt(CURRENT_PAGE_BUNDLE_KEY, mCurrentPage);
         MainActivity mainActivity = (MainActivity) getActivity();
 
-        if(mainActivity!=null)
-        mainActivity.enqueueForApiData(this, args);
+        if (mainActivity != null)
+            mainActivity.enqueueForApiData(this, args);
         else
             Log.e(TAG, "fetchApiData: Main activity is null.");
     }
@@ -87,6 +98,8 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
 
         newsRecyclerView.setItemAnimator(new NewsItemAnimator());
         newsRecyclerView.setAdapter(mNewsAdapter);
+
+        mNewsAdapter.setOnViewClickedListener(this);
     }
 
     static NewsFeedFragment newInstance(int currentPage) {
@@ -139,9 +152,10 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
 
     /**
      * Swaps the visibility for the two views
+     *
      * @param visibleView The view which will become gone
-     * @param goneView The view which will become visible
-     * */
+     * @param goneView    The view which will become visible
+     */
     private void swapVisibility(View visibleView, View goneView) {
         visibleView.setVisibility(View.GONE);
         goneView.setVisibility(View.VISIBLE);

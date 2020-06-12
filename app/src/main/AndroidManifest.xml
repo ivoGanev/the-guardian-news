@@ -16,7 +16,7 @@
         <!-- TODO: Uncomment the line bellow and change the main activity class to be .MainActivity -->
 <!--        <activity android:name=".DbTestActivityActivity"></activity>-->
         <activity
-            android:name=".DbTestActivityActivity"
+            android:name=".MainActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
