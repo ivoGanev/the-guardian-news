@@ -8,4 +8,5 @@
     <dimen name="text_size_large">23sp</dimen>
     <dimen name="text_size_extra_large">36sp</dimen>
     <dimen name="news_feed_element_height">160dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

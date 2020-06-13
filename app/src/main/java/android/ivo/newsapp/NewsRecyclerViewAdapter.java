@@ -10,10 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class NewsRecyclerViewAdaptor
-        extends RecyclerView.Adapter<NewsRecyclerViewAdaptor.NewsViewHolder> {
+public class NewsRecyclerViewAdapter
+        extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
 
-    private static final String TAG = NewsRecyclerViewAdaptor.class.getSimpleName();
+    private static final String TAG = NewsRecyclerViewAdapter.class.getSimpleName();
     private List<News> mNews;
     private NewsViewHolder.OnViewClickedListener mOnViewClickedListener;
 

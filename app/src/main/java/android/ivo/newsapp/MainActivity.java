@@ -159,8 +159,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menu_main_settings) {
+        if (item.getItemId() == R.id.menu_settings) {
             Intent intent = new Intent(this, PreferenceActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        else if(item.getItemId() == R.id.menu_bookmarks) {
+            Intent intent = new Intent(this, BookmarksActivity.class);
             startActivity(intent);
             return true;
         }
