@@ -26,7 +26,7 @@ public class NewsItemAnimator extends DefaultItemAnimator {
 
     @Override
     public boolean animateChange(RecyclerView.ViewHolder oldHolder, RecyclerView.ViewHolder newHolder, int fromX, int fromY, int toX, int toY) {
-        final NewsRecyclerViewAdapter.NewsViewHolder holder = (NewsRecyclerViewAdapter.NewsViewHolder) oldHolder;
+        final NewsElementHeadlinesAdapter.ViewHolder holder = (NewsElementHeadlinesAdapter.ViewHolder) oldHolder;
 
         Animation a = new AlphaAnimation(0, 1);
         a.setInterpolator(new DecelerateInterpolator());
@@ -53,7 +53,5 @@ public class NewsItemAnimator extends DefaultItemAnimator {
         extras.setAnimation(a);
         a.start();
         return true;
-
-        //return    animateMove(holder, fromX, fromY, toX, toY);
     }
 }

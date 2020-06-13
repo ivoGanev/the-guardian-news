@@ -25,29 +25,29 @@ import java.util.ArrayList;
 
 public class NewsFeedFragment extends Fragment
         implements MainActivity.OnApiDataReceived,
-        NewsRecyclerViewAdapter.NewsViewHolder.OnViewClickedListener {
+        NewsElementHeadlinesAdapter.ViewHolder.OnViewClickedListener {
 
     private static final String TAG = "NewsFeedFragment";
     private NewsFragmentContainerBinding mBinding;
-    private NewsRecyclerViewAdapter mNewsAdapter;
+    private NewsElementHeadlinesAdapter mNewsAdapter;
 
     private final static String CURRENT_PAGE_BUNDLE_KEY = "currentPage";
     private int mCurrentPage;
 
     @Override
-    public void onHttpButtonClicked(NewsRecyclerViewAdapter.NewsViewHolder holder) {
+    public void onHttpButtonClicked(NewsElementHeadlinesAdapter.ViewHolder holder) {
         News news = mNewsAdapter.getNews(holder.getAdapterPosition());
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
         startActivity(i);
     }
 
     @Override
-    public void onBookmarksButtonClicked(NewsRecyclerViewAdapter.NewsViewHolder holder) {
+    public void onBookmarksButtonClicked(NewsElementHeadlinesAdapter.ViewHolder holder) {
         Log.d(TAG, "onBookmarksButtonClicked: Not implemented yet");
     }
 
     @Override
-    public void onElementClicked(NewsRecyclerViewAdapter.NewsViewHolder holder) {
+    public void onElementClicked(NewsElementHeadlinesAdapter.ViewHolder holder) {
         mNewsAdapter.notifyItemChanged(holder.getAdapterPosition());
         View extras = holder.binding.newsExtras;
         if (extras.getVisibility() == View.GONE)
@@ -102,7 +102,7 @@ public class NewsFeedFragment extends Fragment
 
     private void initRecyclerView() {
         RecyclerView newsRecyclerView = mBinding.recyclerView;
-        mNewsAdapter = new NewsRecyclerViewAdapter();
+        mNewsAdapter = new NewsElementHeadlinesAdapter();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
         newsRecyclerView.addItemDecoration(

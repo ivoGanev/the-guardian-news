@@ -8,53 +8,25 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+class NewsElementHeadlinesAdapter extends NewsElementAdapter<NewsElementHeadlinesAdapter.ViewHolder> {
+    private ViewHolder.OnViewClickedListener mOnViewClickedListener;
 
-public class NewsRecyclerViewAdapter
-        extends RecyclerView.Adapter<NewsRecyclerViewAdapter.NewsViewHolder> {
-
-    private static final String TAG = NewsRecyclerViewAdapter.class.getSimpleName();
-    private List<News> mNews;
-    private NewsViewHolder.OnViewClickedListener mOnViewClickedListener;
-
-    void addAll(List<News> news) {
-        this.mNews = news;
-        notifyDataSetChanged();
-    }
-
-    public News getNews(int position)
-    {
-        return mNews.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return mNews.get(position).hashCode();
-    }
-
-    @Override
-    public int getItemCount() {
-        if (mNews != null)
-            return mNews.size();
-        return 0;
-    }
-
-    public void setOnViewClickedListener(NewsViewHolder.OnViewClickedListener onViewClickedListener) {
+    public void setOnViewClickedListener(ViewHolder.OnViewClickedListener onViewClickedListener) {
         mOnViewClickedListener = onViewClickedListener;
     }
 
     @NonNull
     @Override
-    public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.news_feed_element, parent, false);
-        final NewsViewHolder holder = new NewsViewHolder(view, mOnViewClickedListener);
+        final ViewHolder holder = new ViewHolder(view, mOnViewClickedListener);
 
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull NewsViewHolder holder, final int position) {
-        final News news = mNews.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        final News news = getNews(position);
         NewsFeedElementBinding binding = holder.binding;
 
         binding.newsFeedTitle.setText(news.getTitle());
@@ -68,17 +40,19 @@ public class NewsRecyclerViewAdapter
             binding.newsFeedByline.setVisibility(View.GONE);
     }
 
-    static class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        final NewsFeedElementBinding binding;
-        private OnViewClickedListener onViewClickListener;
+    static class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener
+    {
+        NewsFeedElementBinding binding;
+        private ViewHolder.OnViewClickedListener onViewClickListener;
 
-        NewsViewHolder(@NonNull View itemView, OnViewClickedListener listener) {
+        public ViewHolder(@NonNull View itemView, OnViewClickedListener listener) {
             super(itemView);
             binding = NewsFeedElementBinding.bind(itemView);
-            onViewClickListener = listener;
             itemView.setOnClickListener(this);
             binding.newsFeedBtnHtml.setOnClickListener(this);
             binding.newsFeedBtnBookmark.setOnClickListener(this);
+            this.onViewClickListener = listener;
         }
 
         @Override
@@ -96,11 +70,11 @@ public class NewsRecyclerViewAdapter
         }
 
         interface OnViewClickedListener {
-            void onHttpButtonClicked(NewsViewHolder holder);
+            void onHttpButtonClicked(ViewHolder holder);
 
-            void onBookmarksButtonClicked(NewsViewHolder holder);
+            void onBookmarksButtonClicked(ViewHolder holder);
 
-            void onElementClicked(NewsViewHolder holder);
+            void onElementClicked(ViewHolder holder);
         }
     }
 }
