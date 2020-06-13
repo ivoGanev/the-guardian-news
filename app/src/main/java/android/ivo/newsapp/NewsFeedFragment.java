@@ -25,21 +25,36 @@ import java.util.ArrayList;
 
 public class NewsFeedFragment extends Fragment
         implements MainActivity.OnApiDataReceived,
-        NewsRecyclerViewAdapter.OnViewClickedListener {
-
-    @Override
-    public void onHttpButtonClicked(News news, View view) {
-        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
-        startActivity(i);
-    }
+        NewsRecyclerViewAdapter.NewsViewHolder.OnViewClickedListener {
 
     private static final String TAG = "NewsFeedFragment";
     private NewsFragmentContainerBinding mBinding;
     private NewsRecyclerViewAdapter mNewsAdapter;
 
-    private ArrayList<News> mPageNews = new ArrayList<>();
     private final static String CURRENT_PAGE_BUNDLE_KEY = "currentPage";
     private int mCurrentPage;
+
+    @Override
+    public void onHttpButtonClicked(NewsRecyclerViewAdapter.NewsViewHolder holder) {
+        News news = mNewsAdapter.getNews(holder.getAdapterPosition());
+        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
+        startActivity(i);
+    }
+
+    @Override
+    public void onBookmarksButtonClicked(NewsRecyclerViewAdapter.NewsViewHolder holder) {
+        Log.d(TAG, "onBookmarksButtonClicked: Not implemented yet");
+    }
+
+    @Override
+    public void onElementClicked(NewsRecyclerViewAdapter.NewsViewHolder holder) {
+        mNewsAdapter.notifyItemChanged(holder.getAdapterPosition());
+        View extras = holder.binding.newsExtras;
+        if (extras.getVisibility() == View.GONE)
+            extras.setVisibility(View.VISIBLE);
+        else
+            extras.setVisibility(View.GONE);
+    }
 
     @IntDef(flag = true, value = {
             State.EMPTY,
@@ -87,7 +102,7 @@ public class NewsFeedFragment extends Fragment
 
     private void initRecyclerView() {
         RecyclerView newsRecyclerView = mBinding.recyclerView;
-        mNewsAdapter = new NewsRecyclerViewAdapter(mPageNews);
+        mNewsAdapter = new NewsRecyclerViewAdapter();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
         newsRecyclerView.addItemDecoration(
