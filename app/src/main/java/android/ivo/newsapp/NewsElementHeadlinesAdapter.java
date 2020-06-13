@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 class NewsElementHeadlinesAdapter extends NewsElementAdapter<NewsElementHeadlinesAdapter.ViewHolder> {
     private ViewHolder.OnViewClickedListener mOnViewClickedListener;
 
-    public void setOnViewClickedListener(ViewHolder.OnViewClickedListener onViewClickedListener) {
+    public NewsElementHeadlinesAdapter(ViewHolder.OnViewClickedListener onViewClickedListener) {
         mOnViewClickedListener = onViewClickedListener;
     }
 

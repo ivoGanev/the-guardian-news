@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -43,7 +44,10 @@ public class NewsFeedFragment extends Fragment
 
     @Override
     public void onBookmarksButtonClicked(NewsElementHeadlinesAdapter.ViewHolder holder) {
-        Log.d(TAG, "onBookmarksButtonClicked: Not implemented yet");
+        NewsDatabase newsDatabase = NewsDatabase.getInstance(getContext());
+        News news = mNewsAdapter.getNews(holder.getAdapterPosition());
+        newsDatabase.newsDao().insertNews(news);
+        Toast.makeText(getContext(), "Successfully added as a bookmark", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -102,7 +106,7 @@ public class NewsFeedFragment extends Fragment
 
     private void initRecyclerView() {
         RecyclerView newsRecyclerView = mBinding.recyclerView;
-        mNewsAdapter = new NewsElementHeadlinesAdapter();
+        mNewsAdapter = new NewsElementHeadlinesAdapter(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
         newsRecyclerView.addItemDecoration(
@@ -113,8 +117,6 @@ public class NewsFeedFragment extends Fragment
 
         newsRecyclerView.setItemAnimator(new NewsItemAnimator());
         newsRecyclerView.setAdapter(mNewsAdapter);
-
-        mNewsAdapter.setOnViewClickedListener(this);
     }
 
     static NewsFeedFragment newInstance(int currentPage) {

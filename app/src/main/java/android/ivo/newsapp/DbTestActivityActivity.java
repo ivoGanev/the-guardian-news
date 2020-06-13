@@ -67,7 +67,7 @@ public class DbTestActivityActivity extends AppCompatActivity {
 
                 // testing only the first item
                 News oldNews = news.get(0);
-                oldNews.setTitle(updatedNewsTitle);
+               // oldNews.setTitle(updatedNewsTitle);
                 newsDao.updateNews(oldNews);
             }
         });

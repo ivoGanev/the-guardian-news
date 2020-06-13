@@ -15,8 +15,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".BookmarksActivity"
+            android:parentActivityName=".MainActivity"
             android:label="@string/title_activity_bookmarks"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            />
         <!-- TODO: Uncomment the line bellow and change the main activity class to be .MainActivity -->
         <!-- <activity android:name=".DbTestActivityActivity"></activity> -->
         <activity

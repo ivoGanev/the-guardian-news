@@ -122,11 +122,6 @@ class News {
         return id;
     }
 
-    // TODO: Remove the setter when all tests are finished
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
     @Override
     public String toString() {
         return "News{" +
