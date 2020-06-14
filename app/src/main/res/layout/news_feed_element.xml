@@ -21,7 +21,7 @@
         tools:text="News feed title" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:visibility="visible"
+        android:visibility="gone"
         android:id="@+id/news_extras"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
