@@ -15,11 +15,7 @@ import android.ivo.newsapp.databinding.ActivityMainBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,32 +34,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String API_KEY = BuildConfig.API_KEY;
     private static final String USER_INPUT_KEY = "userInput";
 
-    /** This will simply delay the reloading of any news while the user types, until the given
-     * threshold. The threshold is in milliseconds */
+    private NewsDatabase newsDatabase;
+    /**
+     * This will simply delay the reloading of any news while the user types, until the given
+     * threshold. The threshold is in milliseconds
+     */
     private static final long UPDATE_NEWS_DELAY_THRESHOLD = 500;
 
     private OnApiDataReceived mApiDataHandler = null;
     private Queue<FragmentArgs> mFragmentApiLoadingQueue;
-    private RunLastDelayedTask mRunLastDelayedTask;
     private Handler mInputDelayHandler;
-
-    private static class FragmentArgs {
-        private Fragment mFragment;
-        private Bundle mArgs;
-
-        FragmentArgs(Fragment fragment, Bundle args) {
-            mFragment = fragment;
-            mArgs = args;
-        }
-
-        Fragment getFragment() {
-            return mFragment;
-        }
-
-        Bundle getArgs() {
-            return mArgs;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,9 +59,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mViewPager = mBinding.activityMainViewPager;
 
-        onUserQueryInput();
-
-        mRunLastDelayedTask = new RunLastDelayedTask(UPDATE_NEWS_DELAY_THRESHOLD, new Runnable() {
+        RunLastDelayedTask delayedTask = new RunLastDelayedTask(UPDATE_NEWS_DELAY_THRESHOLD, new Runnable() {
             @Override
             public void run() {
                 mInputDelayHandler.sendEmptyMessage(0);
@@ -95,25 +73,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 reloadGuardianApiData();
             }
         };
-    }
 
-    private void onUserQueryInput() {
-        mBinding.activityMainTextInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        mBinding.activityMainTextInput.addTextChangedListener(new AfterTextChangeWatcher(delayedTask));
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                Thread thread = new Thread(mRunLastDelayedTask);
-                thread.start();
-            }
-        });
+        newsDatabase = NewsDatabase.getInstance(this);
     }
 
     private void reloadGuardianApiData() {
@@ -133,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<NewsResponse> onCreateLoader(int id, @Nullable Bundle args) {
         String query = mBinding.activityMainTextInput.getText().toString();
 
-        Uri uri = Uri.parse(GUARDIAN_URL);
+        final Uri uri = Uri.parse(GUARDIAN_URL);
+
         Uri.Builder uriBuilder = uri.buildUpon();
         int currentPage = 1;
         if (args != null)
@@ -195,8 +159,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.menu_main_settings) {
+        if (item.getItemId() == R.id.menu_settings) {
             Intent intent = new Intent(this, PreferenceActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        else if(item.getItemId() == R.id.menu_bookmarks) {
+            Intent intent = new Intent(this, BookmarksActivity.class);
             startActivity(intent);
             return true;
         }
@@ -204,7 +173,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     /**
-     * Doing simple network chaining calls with a <code>Queue</code>.
+     * This method is doing simple network chaining calls, queueing all the fragments in a list
+     * that request the api data.
+     * <p>
      * Adds the fragment to a queue with http queries.
      * All the pager adapter fragments will be added to a queue in order to receive their
      * respective news data in a queued fashion. This is done because there is only one
@@ -228,6 +199,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        newsDatabase.close();
+    }
+
     public interface OnApiDataReceived {
         void handleReceivedApiData(ArrayList<News> newsData);
     }
@@ -239,4 +216,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onSaveInstanceState(outState);
     }
 
+    private static class FragmentArgs {
+        private Fragment mFragment;
+        private Bundle mArgs;
+
+        FragmentArgs(Fragment fragment, Bundle args) {
+            mFragment = fragment;
+            mArgs = args;
+        }
+
+        Fragment getFragment() {
+            return mFragment;
+        }
+
+        Bundle getArgs() {
+            return mArgs;
+        }
+    }
 }

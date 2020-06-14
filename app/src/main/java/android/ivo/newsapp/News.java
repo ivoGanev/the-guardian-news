@@ -1,25 +1,37 @@
 package android.ivo.newsapp;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "news")
 class News {
+    @PrimaryKey(autoGenerate = true)
+    private int id;
     /**
      * The date when the article has been published
      */
+    @ColumnInfo(name = "publication_date")
     private String publicationDate;
     /**
      * The type of news (e.g. Politics, Business, Environment)
      */
+    @ColumnInfo(name = "section_name")
     private String sectionName;
     /**
      * The title of the news article
      */
+    @ColumnInfo(name = "title")
     private String title;
     /**
      * Link to the public news address
      */
+    @ColumnInfo(name = "url_address")
     private String httpUrl;
     /**
      * The byline on a newspaper or magazine article gives the name of the writer of the article
      */
+    @ColumnInfo(name = "byline")
     private String byline;
 
     static class Builder {
@@ -59,6 +71,19 @@ class News {
         }
     }
 
+
+    /**
+     * Do not use this constructor. It is specially created for ROOM. Use the builder instead.
+     */
+    public News(int id, String publicationDate, String sectionName, String title, String httpUrl, String byline) {
+        this.id = id;
+        this.publicationDate = publicationDate;
+        this.sectionName = sectionName;
+        this.title = title;
+        this.httpUrl = httpUrl;
+        this.byline = byline;
+    }
+    
     private News(Builder builder) {
         publicationDate = builder.publicationDate;
         sectionName = builder.sectionName;
@@ -91,6 +116,10 @@ class News {
 
     String getHttpUrl() {
         return httpUrl;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override

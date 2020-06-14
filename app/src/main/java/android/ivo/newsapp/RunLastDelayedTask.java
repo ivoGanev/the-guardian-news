@@ -23,7 +23,7 @@ class RunLastDelayedTask implements Runnable {
     }
 
     /**
-     * <code>RunLastDelayedTask</code> is a proxy to a <code>Runnable</code>
+     * <code>RunLastDelayedTask</code> is a wrapper to a <code>Runnable</code>
      * with a changed functionality to run only when the <code>delay</code> duration
      * has been reached. If more than one threads execute the run() method then <b>only
      * the final</b> call will be executed.

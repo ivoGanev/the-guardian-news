@@ -2,17 +2,20 @@ package android.ivo.newsapp;
 
 import android.content.Intent;
 import android.ivo.newsapp.databinding.NewsFragmentContainerBinding;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,14 +24,41 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 
-public class NewsFeedFragment extends Fragment implements MainActivity.OnApiDataReceived {
+public class NewsFeedFragment extends Fragment
+        implements MainActivity.OnApiDataReceived,
+        NewsElementHeadlinesAdapter.ViewHolder.OnViewClickedListener {
+
     private static final String TAG = "NewsFeedFragment";
     private NewsFragmentContainerBinding mBinding;
-    private NewsRecyclerViewAdapter mNewsAdapter;
+    private NewsElementHeadlinesAdapter mNewsAdapter;
 
-    private ArrayList<News> mPageNews = new ArrayList<>();
     private final static String CURRENT_PAGE_BUNDLE_KEY = "currentPage";
     private int mCurrentPage;
+
+    @Override
+    public void onHttpButtonClicked(NewsElementHeadlinesAdapter.ViewHolder holder) {
+        News news = mNewsAdapter.getNews(holder.getAdapterPosition());
+        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(news.getHttpUrl()));
+        startActivity(i);
+    }
+
+    @Override
+    public void onBookmarksButtonClicked(NewsElementHeadlinesAdapter.ViewHolder holder) {
+        NewsDatabase newsDatabase = NewsDatabase.getInstance(getContext());
+        News news = mNewsAdapter.getNews(holder.getAdapterPosition());
+        newsDatabase.newsDao().insertNews(news);
+        Toast.makeText(getContext(), "Successfully added as a bookmark", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onElementClicked(NewsElementHeadlinesAdapter.ViewHolder holder) {
+        mNewsAdapter.notifyItemChanged(holder.getAdapterPosition());
+        View extras = holder.binding.newsExtras;
+        if (extras.getVisibility() == View.GONE)
+            extras.setVisibility(View.VISIBLE);
+        else
+            extras.setVisibility(View.GONE);
+    }
 
     @IntDef(flag = true, value = {
             State.EMPTY,
@@ -68,21 +98,24 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
         args.putInt(CURRENT_PAGE_BUNDLE_KEY, mCurrentPage);
         MainActivity mainActivity = (MainActivity) getActivity();
 
-        if(mainActivity!=null)
-        mainActivity.enqueueForApiData(this, args);
+        if (mainActivity != null)
+            mainActivity.enqueueForApiData(this, args);
         else
             Log.e(TAG, "fetchApiData: Main activity is null.");
     }
 
     private void initRecyclerView() {
         RecyclerView newsRecyclerView = mBinding.recyclerView;
-        mNewsAdapter = new NewsRecyclerViewAdapter(mPageNews);
+        mNewsAdapter = new NewsElementHeadlinesAdapter(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
         newsRecyclerView.addItemDecoration(
                 new DividerItemDecoration(requireContext(),
                         linearLayoutManager.getOrientation()));
         newsRecyclerView.setLayoutManager(linearLayoutManager);
+        mNewsAdapter.setHasStableIds(true);
+
+        newsRecyclerView.setItemAnimator(new NewsItemAnimator());
         newsRecyclerView.setAdapter(mNewsAdapter);
     }
 
@@ -91,6 +124,7 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
         Bundle args = new Bundle();
         args.putInt(CURRENT_PAGE_BUNDLE_KEY, currentPage);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -135,16 +169,12 @@ public class NewsFeedFragment extends Fragment implements MainActivity.OnApiData
 
     /**
      * Swaps the visibility for the two views
+     *
      * @param visibleView The view which will become gone
-     * @param goneView The view which will become visible
-     * */
+     * @param goneView    The view which will become visible
+     */
     private void swapVisibility(View visibleView, View goneView) {
         visibleView.setVisibility(View.GONE);
         goneView.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
     }
 }

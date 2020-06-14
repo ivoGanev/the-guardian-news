@@ -14,8 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:launchMode="singleTop"
+            android:name=".BookmarksActivity"
+            android:parentActivityName=".MainActivity"
+            android:label="@string/title_activity_bookmarks"
+            />
+        <!-- TODO: Uncomment the line bellow and change the main activity class to be .MainActivity -->
+        <!-- <activity android:name=".DbTestActivityActivity"></activity> -->
+        <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +30,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PreferenceActivity"
+        <activity
+            android:name=".PreferenceActivity"
             android:parentActivityName=".MainActivity"
             tools:targetApi="jelly_bean" />
     </application>

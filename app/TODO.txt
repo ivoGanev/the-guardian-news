@@ -1,0 +1,1 @@
+TODO: 1) Make use of the relational database to store favourite news
