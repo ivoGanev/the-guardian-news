@@ -1,5 +1,7 @@
 package android.ivo.newsapp;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -13,9 +15,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
+import java.net.URI;
 import java.util.List;
 
-public class BookmarksActivity extends AppCompatActivity implements NewsElementBookmarksAdapter.ViewHolder.OnViewClickListener {
+import static android.ivo.newsapp.NewsElementBookmarksAdapter.*;
+
+public class BookmarksActivity extends AppCompatActivity implements ViewHolder.OnViewClickListener {
     private RecyclerView mRecyclerView;
     private NewsElementBookmarksAdapter mNewsElementHeadlinesAdapter;
     private NewsDatabase mDatabase;
@@ -36,11 +41,19 @@ public class BookmarksActivity extends AppCompatActivity implements NewsElementB
     }
 
     @Override
-    public void OnDeleteClicked(NewsElementBookmarksAdapter.ViewHolder holder) {
+    public void OnDeleteClicked(ViewHolder holder) {
         News currentNews = mNewsElementHeadlinesAdapter.getNews(holder.getAdapterPosition());
         Log.d("TAG", "OnDeleteClicked: " + currentNews.getTitle());
         mDatabase.newsDao().deleteNews(currentNews);
         updateRecyclerView();
+    }
+
+    @Override
+    public void OnLayoutClicked(ViewHolder holder) {
+        News currentNews = mNewsElementHeadlinesAdapter.getNews(holder.getAdapterPosition());
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(currentNews.getHttpUrl()));
+        startActivity(intent);
     }
 
     private void updateRecyclerView()

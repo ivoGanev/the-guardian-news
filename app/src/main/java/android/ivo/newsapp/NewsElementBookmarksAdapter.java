@@ -1,6 +1,5 @@
 package android.ivo.newsapp;
 
-import android.ivo.newsapp.databinding.ActivityBookmarksBinding;
 import android.ivo.newsapp.databinding.BookmarksElementBinding;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,23 +32,32 @@ class NewsElementBookmarksAdapter extends NewsElementAdapter<NewsElementBookmark
 
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         BookmarksElementBinding binding;
-        private OnViewClickListener mOnViewClickListener;
+        private final OnViewClickListener mOnViewClickListener;
 
         public ViewHolder(@NonNull View itemView, OnViewClickListener listener) {
             super(itemView);
             binding = BookmarksElementBinding.bind(itemView);
             binding.bookmarkBtnDelete.setOnClickListener(this);
+            binding.bookmarkLayout.setOnClickListener(this);
             mOnViewClickListener = listener;
         }
 
         @Override
         public void onClick(View v) {
-            if (mOnViewClickListener != null)
-                mOnViewClickListener.OnDeleteClicked(this);
+            if (mOnViewClickListener != null) {
+                if (v.getId() == R.id.bookmark_btn_delete) {
+                    mOnViewClickListener.OnDeleteClicked(this);
+                }
+                else if (v.getId() == R.id.bookmark_layout) {
+                    mOnViewClickListener.OnLayoutClicked(this);
+                }
+            }
         }
 
         interface OnViewClickListener {
             void OnDeleteClicked(ViewHolder holder);
+
+            void OnLayoutClicked(ViewHolder holder);
         }
     }
 }
