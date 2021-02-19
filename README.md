@@ -1,4 +1,7 @@
 # The Guardian News  
+
+![alt-text](etc/8421748217.gif)
+
   
 An Android app that provides news from the Guardian API. Includes features like:
 
